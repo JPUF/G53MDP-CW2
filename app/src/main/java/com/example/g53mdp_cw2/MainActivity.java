@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if(mp3FileList == null) {
+        if(mp3FileList == null) {//TODO test and probs improve handling of no files.
             mp3FileList = new File[1];
             mp3FileList[0] = new File("emptyfile");
         }
