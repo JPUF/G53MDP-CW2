@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
         final MP3Player mp3Player = new MP3Player();
 
-        final ListView fileListView = (ListView) findViewById(R.id.file_list);
+        final ListView fileListView = findViewById(R.id.file_list);
 
         String path = Environment.getExternalStorageDirectory().getPath() + "/Music/";
         File musicDir = new File(path);
@@ -35,13 +36,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if(mp3FileList == null) {//TODO test and probs improve handling of no files.
-            mp3FileList = new File[1];
-            mp3FileList[0] = new File("emptyfile");
+        final TextView headerTextView = findViewById(R.id.file_header_text);
+
+        if (mp3FileList == null) {
+            headerTextView.setText(R.string.no_access);
+        } else if (mp3FileList.length < 1) {
+            headerTextView.setText(R.string.no_files);
+        } else {
+            fileListView.setAdapter(new ArrayAdapter<File>(this,
+                    android.R.layout.simple_list_item_1, mp3FileList));
         }
 
-        fileListView.setAdapter(new ArrayAdapter<File>(this,
-                android.R.layout.simple_list_item_1, mp3FileList));
 
         fileListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
