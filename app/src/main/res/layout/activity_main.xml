@@ -75,6 +75,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/stop" />
+
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="callService"
+            android:text="service" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

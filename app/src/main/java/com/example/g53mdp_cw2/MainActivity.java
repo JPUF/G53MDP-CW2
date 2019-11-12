@@ -2,8 +2,13 @@ package com.example.g53mdp_cw2;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,18 +22,36 @@ import java.io.FileFilter;
 
 public class MainActivity extends AppCompatActivity {
 
+    private MP3Service.MP3Binder service = null;
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            Log.d("MP3 Time", "onServiceConnected");
+            service = (MP3Service.MP3Binder) iBinder;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            Log.d("MP3 Time", "onServiceDisconnected");
+            service = null;
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        this.bindService(new Intent(this, MP3Service.class),
+                serviceConnection, Context.BIND_AUTO_CREATE);
+
+
         final MP3Player mp3Player = new MP3Player();
 
         final ListView fileListView = findViewById(R.id.file_list);
-
         String path = Environment.getExternalStorageDirectory().getPath() + "/Music/";
         File musicDir = new File(path);
-
         Log.d("MP3 Time", path);
         File[] mp3FileList = musicDir.listFiles(new FileFilter() {
             @Override
@@ -83,5 +106,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void callService(View view) {
+        service.serviceCall();
     }
 }
