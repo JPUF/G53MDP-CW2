@@ -4,4 +4,6 @@
     <string name="music_files">/Music/ files</string>
     <string name="no_files">No files found in /Music/</string>
     <string name="no_access">No access to /Music/ (have you given storage permissions?)</string>
+    <string name="pause">Pause</string>
+    <string name="stop">Stop</string>
 </resources>

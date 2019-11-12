@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -54,6 +55,31 @@ public class MainActivity extends AppCompatActivity {
                 File selectedFile = (File) (fileListView.getItemAtPosition(i));
                 mp3Player.load(selectedFile.getPath());
                 mp3Player.play();
+            }
+        });
+
+        final Button playButton = findViewById(R.id.play_button);
+        final Button pauseButton = findViewById(R.id.pause_button);
+        final Button stopButton = findViewById(R.id.stop_button);
+
+        playButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                mp3Player.play();
+            }
+        });
+
+        pauseButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                mp3Player.pause();
+            }
+        });
+
+        stopButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                mp3Player.stop();
             }
         });
 
