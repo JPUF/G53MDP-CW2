@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (mp3FileList.length < 1) {
             headerTextView.setText(R.string.no_files);
         } else {
-            fileListView.setAdapter(new ArrayAdapter<File>(this,
+            fileListView.setAdapter(new ArrayAdapter<>(this,
                     android.R.layout.simple_list_item_1, mp3FileList));
         }
 

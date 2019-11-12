@@ -14,17 +14,14 @@ import androidx.core.app.NotificationCompat;
 
 public class MP3Service extends Service {
 
-    private final String CHANNEL_ID = "100";
-    private final int NOTIFICATION_ID = 001;
-
     private final IBinder binder = new MP3Binder();
     private final MP3Player mp3Player = new MP3Player();
 
     @Override
     public IBinder onBind(Intent intent) {
-
+        String CHANNEL_ID = "100";
+        int NOTIFICATION_ID = 1;
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "MP3 Player notification channel";
             String description = "Notification channel for MP3 Player app";
@@ -36,8 +33,6 @@ public class MP3Service extends Service {
         }
         Intent mainIntent = new Intent(this, MainActivity.class);
         PendingIntent mainPendingIntent = PendingIntent.getActivity(this, 0, mainIntent, 0);
-        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        //PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this, CHANNEL_ID)
@@ -47,13 +42,13 @@ public class MP3Service extends Service {
                         .setContentText("Back to player")
                         .setContentIntent(mainPendingIntent)
                         .setPriority(NotificationCompat.PRIORITY_LOW);
-        //notificationManager.notify(NOTIFICATION_ID, builder.build());
+
         startForeground(NOTIFICATION_ID, builder.build());
 
         return binder;
     }
 
-    public class MP3Binder extends Binder {
+    class MP3Binder extends Binder {
 
         void loadMP3(String filePath) {
             Log.d("MP3 Time", "Loading MP3");
