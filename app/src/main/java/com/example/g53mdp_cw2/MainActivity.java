@@ -3,7 +3,6 @@ package com.example.g53mdp_cw2;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -28,8 +27,7 @@ import java.io.FileFilter;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final String CHANNEL_ID = "100";
-    private final int NOTIFICATION_ID = 001;
+
 
     private MP3Service.MP3Binder service = null;
 
@@ -51,37 +49,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent intent = getIntent();
 
         this.bindService(new Intent(this, MP3Service.class),
                 serviceConnection, Context.BIND_AUTO_CREATE);
-
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "MP3 Player notification channel";
-            String description = "Notification channel for MP3 Player app";
-            int importance = NotificationManager.IMPORTANCE_LOW;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name,
-                    importance);
-            channel.setDescription(description);
-            notificationManager.createNotificationChannel(channel);
-        }
-
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this, CHANNEL_ID)
-                        .setSmallIcon(R.drawable.ic_launcher_background)
-                        .setSound(null)
-                        .setContentTitle("MP3 Player")
-                        .setContentText("Back to player")
-                        .setContentIntent(pendingIntent)
-                        .setPriority(NotificationCompat.PRIORITY_LOW);
-        notificationManager.notify(NOTIFICATION_ID, builder.build());
-
 
         final ListView fileListView = findViewById(R.id.file_list);
         String path = Environment.getExternalStorageDirectory().getPath() + "/Music/";
