@@ -1,16 +1,9 @@
 package com.example.g53mdp_cw2;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
@@ -22,11 +15,12 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.io.File;
 import java.io.FileFilter;
 
 public class MainActivity extends AppCompatActivity {
-
 
 
     private MP3Service.MP3Binder service = null;
@@ -50,8 +44,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.bindService(new Intent(this, MP3Service.class),
-                serviceConnection, Context.BIND_AUTO_CREATE);
+
+        Intent serviceIntent = new Intent(this, MP3Service.class);
+        this.startService(serviceIntent);
+        this.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
 
         final ListView fileListView = findViewById(R.id.file_list);
         String path = Environment.getExternalStorageDirectory().getPath() + "/Music/";
@@ -116,5 +112,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d("MP3 Time", "MainActivity DESTROYED");
+        if(serviceConnection != null) {
+            unbindService(serviceConnection);
+        }
     }
 }

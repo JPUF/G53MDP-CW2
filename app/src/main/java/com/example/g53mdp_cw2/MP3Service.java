@@ -11,7 +11,6 @@ import android.os.IBinder;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.TaskStackBuilder;
 
 public class MP3Service extends Service {
 
@@ -36,9 +35,7 @@ public class MP3Service extends Service {
             notificationManager.createNotificationChannel(channel);
         }
         Intent mainIntent = new Intent(this, MainActivity.class);
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addNextIntentWithParentStack(mainIntent);
-        PendingIntent mainPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent mainPendingIntent = PendingIntent.getActivity(this, 0, mainIntent, 0);
         //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         //PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
@@ -60,6 +57,10 @@ public class MP3Service extends Service {
 
         void loadMP3(String filePath) {
             Log.d("MP3 Time", "Loading MP3");
+            MP3Player.MP3PlayerState state = mp3Player.getState();
+            if (state == MP3Player.MP3PlayerState.PLAYING || state == MP3Player.MP3PlayerState.PAUSED) {
+                mp3Player.stop();
+            }
             mp3Player.load(filePath);
         }
 
@@ -76,6 +77,7 @@ public class MP3Service extends Service {
         void stopMP3() {
             Log.d("MP3 Time", "Stopping MP3");
             mp3Player.stop();
+            stopSelf();
         }
 
     }
