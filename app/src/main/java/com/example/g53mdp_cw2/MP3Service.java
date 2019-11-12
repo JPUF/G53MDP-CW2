@@ -9,6 +9,7 @@ import android.util.Log;
 public class MP3Service extends Service {
 
     private final IBinder binder = new MP3Binder();
+    private final MP3Player mp3Player = new MP3Player();
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -16,8 +17,26 @@ public class MP3Service extends Service {
     }
 
     public class MP3Binder extends Binder {
-        void serviceCall() {
-            Log.d("MP3 Time", "Binder service call");
+
+        void loadMP3(String filePath) {
+            Log.d("MP3 Time", "Loading MP3");
+            mp3Player.load(filePath);
         }
+
+        void playMP3() {
+            Log.d("MP3 Time", "Playing MP3");
+            mp3Player.play();
+        }
+
+        void pauseMP3() {
+            Log.d("MP3 Time", "Pausing MP3");
+            mp3Player.pause();
+        }
+
+        void stopMP3() {
+            Log.d("MP3 Time", "Stopping MP3");
+            mp3Player.stop();
+        }
+
     }
 }

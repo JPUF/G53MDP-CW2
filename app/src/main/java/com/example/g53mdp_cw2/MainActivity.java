@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
                 serviceConnection, Context.BIND_AUTO_CREATE);
 
 
-        final MP3Player mp3Player = new MP3Player();
+        //final MP3Player mp3Player = new MP3Player();
 
         final ListView fileListView = findViewById(R.id.file_list);
         String path = Environment.getExternalStorageDirectory().getPath() + "/Music/";
@@ -76,8 +76,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 File selectedFile = (File) (fileListView.getItemAtPosition(i));
-                mp3Player.load(selectedFile.getPath());
-                mp3Player.play();
+                service.loadMP3(selectedFile.getPath());
+                service.playMP3();
             }
         });
 
@@ -88,27 +88,23 @@ public class MainActivity extends AppCompatActivity {
         playButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                mp3Player.play();
+                service.playMP3();
             }
         });
 
         pauseButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                mp3Player.pause();
+                service.pauseMP3();
             }
         });
 
         stopButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                mp3Player.stop();
+                service.stopMP3();
             }
         });
 
-    }
-
-    public void callService(View view) {
-        service.serviceCall();
     }
 }
