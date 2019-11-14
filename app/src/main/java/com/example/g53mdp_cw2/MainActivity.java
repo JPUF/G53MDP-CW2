@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -84,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
         final Button playButton = findViewById(R.id.play_button);
         final Button pauseButton = findViewById(R.id.pause_button);
         final Button stopButton = findViewById(R.id.stop_button);
+        final Button elapsedButton = findViewById(R.id.elapsed_button);
+        final ProgressBar songProgress = findViewById(R.id.song_progress);
 
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,6 +108,18 @@ public class MainActivity extends AppCompatActivity {
                 service.stopMP3();
             }
         });
+
+        elapsedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int elapsedTime = service.getElapsedTime();
+                int duration = service.getDuration();
+                songProgress.setMax(duration);
+                songProgress.setProgress(elapsedTime);
+            }
+        });
+
+
 
     }
 

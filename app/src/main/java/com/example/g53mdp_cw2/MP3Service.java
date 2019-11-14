@@ -75,5 +75,28 @@ public class MP3Service extends Service {
             stopSelf();
         }
 
+        int getElapsedTime() {
+            if(songIsLoaded()){
+                return mp3Player.getProgress();
+            }
+            else {
+                return 0;
+            }
+        }
+
+        int getDuration() {
+            if(songIsLoaded()) {
+                return mp3Player.getDuration();
+            }
+            else {
+                return 1;
+            }
+        }
+
+        private boolean songIsLoaded(){
+            MP3Player.MP3PlayerState state = mp3Player.getState();
+            return state == MP3Player.MP3PlayerState.PLAYING || state == MP3Player.MP3PlayerState.PAUSED;
+        }
+
     }
 }
