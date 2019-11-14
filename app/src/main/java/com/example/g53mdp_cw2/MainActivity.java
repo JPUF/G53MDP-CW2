@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private MP3Service.MP3Binder service = null;
+    private Handler handler = new Handler();
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -79,14 +81,13 @@ public class MainActivity extends AppCompatActivity {
                 File selectedFile = (File) (fileListView.getItemAtPosition(i));
                 service.loadMP3(selectedFile.getPath());
                 service.playMP3();
+                handler.post(pollForElapsedTime);
             }
         });
 
         final Button playButton = findViewById(R.id.play_button);
         final Button pauseButton = findViewById(R.id.pause_button);
         final Button stopButton = findViewById(R.id.stop_button);
-        final Button elapsedButton = findViewById(R.id.elapsed_button);
-        final ProgressBar songProgress = findViewById(R.id.song_progress);
 
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,20 +109,20 @@ public class MainActivity extends AppCompatActivity {
                 service.stopMP3();
             }
         });
-
-        elapsedButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int elapsedTime = service.getElapsedTime();
-                int duration = service.getDuration();
-                songProgress.setMax(duration);
-                songProgress.setProgress(elapsedTime);
-            }
-        });
-
-
-
     }
+
+    private final Runnable pollForElapsedTime = new Runnable() {
+        @Override
+        public void run() {
+            int elapsedTime = service.getElapsedTime();
+            int duration = service.getDuration();
+            Log.d("MP3 Time", "duration: "+duration+" time: "+elapsedTime);
+            final ProgressBar songProgress = findViewById(R.id.song_progress);
+            songProgress.setMax(duration);
+            songProgress.setProgress(elapsedTime);
+            handler.postDelayed(this, 1000);
+        }
+    };
 
     @Override
     protected void onDestroy() {
