@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -26,18 +27,20 @@ public class MainActivity extends AppCompatActivity {
 
 
     private MP3Service.MP3Binder service = null;
-    private Handler handler = new Handler();
+
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             Log.d("MP3 Time", "onServiceConnected");
             service = (MP3Service.MP3Binder) iBinder;
+            service.registerCallback(callback);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             Log.d("MP3 Time", "onServiceDisconnected");
+            service.unregisterCallback();
             service = null;
         }
     };
@@ -81,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 File selectedFile = (File) (fileListView.getItemAtPosition(i));
                 service.loadMP3(selectedFile.getPath());
                 service.playMP3();
-                handler.post(pollForElapsedTime);
+                service.updateTimer();
             }
         });
 
@@ -111,16 +114,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private final Runnable pollForElapsedTime = new Runnable() {
+    ICallback callback = new ICallback() {
         @Override
-        public void run() {
-            int elapsedTime = service.getElapsedTime();
-            int duration = service.getDuration();
-            Log.d("MP3 Time", "duration: "+duration+" time: "+elapsedTime);
-            final ProgressBar songProgress = findViewById(R.id.song_progress);
-            songProgress.setMax(duration);
-            songProgress.setProgress(elapsedTime);
-            handler.postDelayed(this, 1000);
+        public void elapsedTimeEvent(final int duration, final int elapsedTime) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ProgressBar songProgress = findViewById(R.id.song_progress);
+                    songProgress.setMax(duration);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        songProgress.setProgress(elapsedTime, true);//animate if SDK > 15
+                    } else {
+                        songProgress.setProgress(elapsedTime);
+                    }
+                }
+            });
         }
     };
 

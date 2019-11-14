@@ -7,8 +7,12 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.IInterface;
+import android.os.RemoteCallbackList;
 import android.util.Log;
+import android.widget.ProgressBar;
 
 import androidx.core.app.NotificationCompat;
 
@@ -16,6 +20,8 @@ public class MP3Service extends Service {
 
     private final IBinder binder = new MP3Binder();
     private final MP3Player mp3Player = new MP3Player();
+    RemoteCallbackList<MP3Binder> remoteCallbackList = new RemoteCallbackList<MP3Binder>();
+    Handler handler = new Handler();
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -48,7 +54,28 @@ public class MP3Service extends Service {
         return binder;
     }
 
-    class MP3Binder extends Binder {
+    private final Runnable pollForElapsedTime = new Runnable() {
+        @Override
+        public void run() {
+            int elapsedTime = mp3Player.getProgress();
+            int duration = mp3Player.getDuration();
+            Log.d("MP3 Time", "duration: " + duration + " time: " + elapsedTime);
+            updateActivityUI(duration, elapsedTime);
+            handler.postDelayed(this, 1000);
+        }
+    };
+
+    public void updateActivityUI(int duration, int elapsedTime) {
+        final int callbackCount = remoteCallbackList.beginBroadcast();
+        for (int i = 0; i < callbackCount; i++) {
+            remoteCallbackList.getBroadcastItem(i).callback.elapsedTimeEvent(duration, elapsedTime);
+        }
+        remoteCallbackList.finishBroadcast();
+    }
+
+    class MP3Binder extends Binder implements IInterface {
+
+        ICallback callback;
 
         void loadMP3(String filePath) {
             Log.d("MP3 Time", "Loading MP3");
@@ -75,28 +102,27 @@ public class MP3Service extends Service {
             stopSelf();
         }
 
-        int getElapsedTime() {
-            if(songIsLoaded()){
-                return mp3Player.getProgress();
-            }
-            else {
-                return 0;
-            }
+        void updateTimer() {
+            handler.post(pollForElapsedTime);
         }
 
-        int getDuration() {
-            if(songIsLoaded()) {
-                return mp3Player.getDuration();
-            }
-            else {
-                return 1;
-            }
-        }
-
-        private boolean songIsLoaded(){
+        private boolean songIsLoaded() {
             MP3Player.MP3PlayerState state = mp3Player.getState();
             return state == MP3Player.MP3PlayerState.PLAYING || state == MP3Player.MP3PlayerState.PAUSED;
         }
 
+        public void registerCallback(ICallback callback) {
+            this.callback = callback;
+            remoteCallbackList.register(MP3Binder.this);
+        }
+
+        public void unregisterCallback() {
+            remoteCallbackList.unregister(MP3Binder.this);
+        }
+
+        @Override
+        public IBinder asBinder() {
+            return this;
+        }
     }
 }
